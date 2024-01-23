@@ -1,8 +1,10 @@
 package com.plutoapps.qotes.data.models
 
+import kotlinx.serialization.Serializable
 import java.util.Calendar
 import java.util.Date
 
+@Serializable
 data class Qote(val quote: String, val author: String, val category: String, val date: String = Calendar.getInstance().timeInMillis.toString()) {
     fun shouldUpdateQote(date: Date): Boolean {
         val calendar = Calendar.getInstance()

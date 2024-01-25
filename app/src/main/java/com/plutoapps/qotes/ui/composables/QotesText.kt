@@ -47,6 +47,6 @@ fun QoteText(modifier: Modifier = Modifier, qote: Qote) {
 @Composable
 fun QoteTextPreview() {
     QoteText(
-        qote = Qote("This is a quote. It is of moderate length and very inspiring.", author = "John Doe", category = "happiness")
-    )
+        qote = Qote(quote = "This is a quote. It is of moderate length and very inspiring.", author = "John Doe", category = "happiness",id= "Id", date = "1706186888349"))
+
 }

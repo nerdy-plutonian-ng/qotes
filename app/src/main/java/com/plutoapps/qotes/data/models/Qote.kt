@@ -1,11 +1,23 @@
 package com.plutoapps.qotes.data.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 import java.util.Calendar
 import java.util.Date
+import java.util.UUID
 
 @Serializable
-data class Qote(val quote: String, val author: String, val category: String, val date: String = Calendar.getInstance().timeInMillis.toString()) {
+@Entity(tableName = "qotes")
+data class Qote(
+    @PrimaryKey
+    val id: String,
+    val quote: String,
+    val author: String,
+    val category: String,
+    val date: String
+) {
+
     fun shouldUpdateQote(date: Date): Boolean {
         val calendar = Calendar.getInstance()
         calendar.time = date

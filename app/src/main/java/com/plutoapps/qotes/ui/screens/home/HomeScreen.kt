@@ -15,8 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.plutoapps.qotes.QotesApplication
+import com.plutoapps.qotes.R
 import com.plutoapps.qotes.data.models.Qote
 
 @Composable
@@ -28,7 +30,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val homeUiState = viewModel.homeState.collectAsState()
     val favourites = viewModel.favoritedQotes.collectAsState()
 
-    val navbarItems = listOf("Qotes" to Icons.Default.Email, "Favourites" to Icons.Default.Favorite)
+    val navbarItems = listOf("Qotes" to R.drawable.quote, "Favourites" to R.drawable.favorite)
 
     val selectTab: (Int) -> Unit = {
         viewModel.setCurrentTab(it)
@@ -36,6 +38,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
     val getQote: () -> Unit = {
         viewModel.getQote()
+    }
+
+    val deleteFavouritedQote : (Qote) -> Unit = {
+        viewModel.unFavoriteAQote(it)
     }
 
     val toggleFavorite: (qote: Qote,shouldUnFavorite:Boolean) -> Unit = {
@@ -58,7 +64,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             NavigationBar {
                 navbarItems.forEachIndexed { index, item ->
                     NavigationBarItem(
-                        icon = { Icon(item.second, contentDescription = null) },
+                        icon = { Icon(painterResource(id = item.second), contentDescription = null) },
                         label = { Text(item.first) },
                         selected = homeUiState.value?.currentTab == index,
                         onClick = { selectTab(index) }
@@ -75,7 +81,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             if (homeUiState.value!!.currentTab == 0)
                 QoteTab(homeUiState = homeUiState.value!!, getQote = getQote, toggleFavorite = toggleFavorite)
             else
-                FavoritesTab(favourites = favourites.value)
+                FavoritesTab(favourites = favourites.value, deleteFavouritedQote = deleteFavouritedQote)
         }
     }
 }

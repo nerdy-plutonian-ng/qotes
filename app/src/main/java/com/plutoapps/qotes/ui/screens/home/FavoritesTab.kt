@@ -1,45 +1,105 @@
 package com.plutoapps.qotes.ui.screens.home
 
+import android.widget.Space
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Button
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.plutoapps.qotes.R
 import com.plutoapps.qotes.data.models.Qote
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesTab(modifier: Modifier = Modifier, favourites: List<Qote>) {
+fun FavoritesTab(modifier: Modifier = Modifier, favourites: List<Qote>, deleteFavouritedQote : (Qote) -> Unit) {
 
     val dateFormat = SimpleDateFormat("EEEE dd MMM yyyy", Locale.getDefault())
+    val scope = rememberCoroutineScope()
 
-    LazyColumn{
-        items(favourites.size,key = {favourites[it].id}){
-            //ListItem(headlineContent = { Text(favourites[it].quote) },)
-            Column {
-                ListItem(
-                    headlineContent = { Text(favourites[it].quote) },
-                    overlineContent = { Text(dateFormat.format(Date(favourites[it].date.toLong()))) },
-                    supportingContent = { Text("- ${favourites[it].author}") },
-                    leadingContent = {
-                        Icon(
-                            painterResource(id = R.drawable.quote),
-                            contentDescription = null,
+    LazyColumn {
+        items(favourites.size, key = { favourites[it].id }) {
+            val qote = favourites[it]
+            val dismissState = rememberDismissState(
+                initialValue = DismissValue.Default,
+                positionalThreshold = { a -> a / 3 },
+                confirmValueChange = {dismissValue ->
+                    dismissValue.name
+                    true }
+            )
+            SwipeToDismiss(state = dismissState, background = {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .background(color = MaterialTheme.colorScheme.errorContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column {
+                        Button(onClick = { deleteFavouritedQote(qote) }) {
+                            Icon(Icons.Default.Delete,null)
+                            Spacer(modifier = modifier.width(16.dp))
+                            Text(stringResource(R.string.delete))
+                        }
+                        OutlinedButton(onClick = {
+                            scope.launch {
+                                dismissState.reset()
+                            }
+                        }) {
+                            Icon(Icons.Default.Close,null)
+                            Spacer(modifier = modifier.width(16.dp))
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                }
+            },
+                directions = setOf(DismissDirection.EndToStart),
+                dismissContent = {
+                    Column {
+                        ListItem(
+                            headlineContent = { Text(qote.quote) },
+                            overlineContent = { Text(dateFormat.format(Date(qote.date.toLong()))) },
+                            supportingContent = { Text("- ${qote.author}") },
+                            leadingContent = {
+                                Icon(
+                                    painterResource(id = R.drawable.quote),
+                                    contentDescription = null,
+                                )
+                            },
                         )
-                    },
-                )
-                Divider()
-            }
+                        Divider()
+                    }
+                })
         }
     }
 }
@@ -47,5 +107,5 @@ fun FavoritesTab(modifier: Modifier = Modifier, favourites: List<Qote>) {
 @Preview
 @Composable
 fun FavoritesTabPreview() {
-    FavoritesTab(favourites = emptyList())
+    FavoritesTab(favourites = emptyList(), deleteFavouritedQote = {})
 }

@@ -3,4 +3,6 @@
     <string name="another">Another</string>
     <string name="try_again">Try Again</string>
     <string name="an_error_occurred">An error occurred</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
 </resources>

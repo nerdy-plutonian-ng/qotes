@@ -1,17 +1,17 @@
 package com.plutoapps.qotes.ui.screens.home
 
-import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Button
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,7 +47,17 @@ fun FavoritesTab(modifier: Modifier = Modifier, favourites: List<Qote>, deleteFa
     val dateFormat = SimpleDateFormat("EEEE dd MMM yyyy", Locale.getDefault())
     val scope = rememberCoroutineScope()
 
-    LazyColumn {
+    if(favourites.isEmpty())
+        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+
+            Column (horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.padding(16.dp)){
+                Icon(painter = painterResource(id = R.drawable.empty_folder), contentDescription = null, modifier = modifier.size(64.dp))
+                Text(text = "Your favorites are empty, once you add some you will see them here.", style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center)
+            }
+        }
+        else
+        LazyColumn {
         items(favourites.size, key = { favourites[it].id }) {
             val qote = favourites[it]
             val dismissState = rememberDismissState(

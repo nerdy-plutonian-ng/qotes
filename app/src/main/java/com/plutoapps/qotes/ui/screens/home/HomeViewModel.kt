@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.plutoapps.qotes.data.models.Qote
 import com.plutoapps.qotes.data.repositories.QoteApi
 import com.plutoapps.qotes.data.repositories.QotesRepo
+import com.plutoapps.qotes.data.repositories.UserPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,10 +19,20 @@ import java.io.IOException
 import java.util.Calendar
 import java.util.UUID
 
-class HomeViewModel(private val qotesRepo: QotesRepo) : ViewModel() {
+class HomeViewModel(private val qotesRepo: QotesRepo,private val userPreferencesRepository: UserPreferencesRepository) : ViewModel() {
 
     private var _homeState = MutableStateFlow(HomeUi())
     val homeState: StateFlow<HomeUi?> = _homeState
+    init {
+       viewModelScope.launch {
+           val todaysQote = userPreferencesRepository.getTodaysQote()
+           if(todaysQote != null) {
+               _homeState.update {
+                   it.copy(qote = todaysQote)
+               }
+           }
+       }
+    }
 
     val favoritedQotes  : StateFlow<List<Qote>> = qotesRepo.getAllQotes().map { it }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000L), initialValue = emptyList())
 
@@ -77,10 +88,10 @@ class HomeViewModel(private val qotesRepo: QotesRepo) : ViewModel() {
 
 }
 
-class HomeViewModelFactory(private val qotesRepo: QotesRepo) : ViewModelProvider.Factory {
+class HomeViewModelFactory(private val qotesRepo: QotesRepo,private val userPreferencesRepository: UserPreferencesRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            return HomeViewModel(qotesRepo) as T
+            return HomeViewModel(qotesRepo,userPreferencesRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

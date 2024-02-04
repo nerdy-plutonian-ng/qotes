@@ -26,11 +26,11 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
     //val viewModel =
     //    ViewModelProvider(LocalContext.current as ViewModelStoreOwner)[HomeViewModel::class.java]
-    val viewModel = HomeViewModelFactory(QotesApplication.qotesRepo!!).create(HomeViewModel::class.java)
+    val viewModel = HomeViewModelFactory(QotesApplication.qotesRepo!!,QotesApplication.userPreferencesRepository!!).create(HomeViewModel::class.java)
     val homeUiState = viewModel.homeState.collectAsState()
     val favourites = viewModel.favoritedQotes.collectAsState()
 
-    val navbarItems = listOf("Qotes" to R.drawable.quote, "Favourites" to R.drawable.favorite)
+    val navbarItems = listOf("Qotes" to R.drawable.quote, "Favourites" to R.drawable.favorite,"Settings" to R.drawable.settings)
 
     val selectTab: (Int) -> Unit = {
         viewModel.setCurrentTab(it)
@@ -80,8 +80,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         ) {
             if (homeUiState.value!!.currentTab == 0)
                 QoteTab(homeUiState = homeUiState.value!!, getQote = getQote, toggleFavorite = toggleFavorite)
-            else
+            else if(homeUiState.value!!.currentTab == 1)
                 FavoritesTab(favourites = favourites.value, deleteFavouritedQote = deleteFavouritedQote)
+            else
+                SettingsTab()
         }
     }
 }

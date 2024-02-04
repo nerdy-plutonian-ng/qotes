@@ -16,7 +16,9 @@ interface QotesRepo {
     suspend fun favoriteQote(qote: Qote)
     suspend fun unFavoriteQote(qote: Qote)
     fun getAllQotes() : Flow<List<Qote>>
-}
+    suspend fun getNewQote() : Qote
+
+    suspend fun getTodaysQote() : Qote?
 
 @Dao
 interface QotesDao {
@@ -46,12 +48,17 @@ abstract class QotesDatabase : RoomDatabase() {
     }
 }
 
-class SqlQotesRepo(private val qotesDao: QotesDao) : QotesRepo {
+class SqlQotesRepo(private val qotesDao: QotesDao, private val qoteService : QoteApiService) : QotesRepo {
     override suspend fun favoriteQote(qote: Qote) = qotesDao.insert(qote)
 
 
     override suspend fun unFavoriteQote(qote: Qote) = qotesDao.delete(qote)
 
     override fun getAllQotes(): Flow<List<Qote>> = qotesDao.getAllQotes()
+    override suspend fun getNewQote(): Qote = qoteService.getQote("happiness").first()
+    override suspend fun getTodaysQote(): Qote? {
+        TODO("Not yet implemented")
+    }
 
+}
 }

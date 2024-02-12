@@ -1,7 +1,15 @@
 package com.plutoapps.qotes.ui.screens.home
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.TimePickerDialog
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -35,11 +44,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationCompat
 import com.plutoapps.qotes.R
+import com.plutoapps.qotes.data.repositories.BgQoteFetchRepo
+import com.plutoapps.qotes.ui.utils.Notify
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsTab(modifier: Modifier = Modifier) {
+
+
 
     val context = LocalContext.current
 
@@ -60,6 +74,21 @@ fun SettingsTab(modifier: Modifier = Modifier) {
         Toast.makeText(context,"${timeState.hour} : ${timeState.minute}",Toast.LENGTH_LONG).show()
     }
 
+    fun showTime(){
+        isReminderOn = true
+        openTimeDialog = true
+    }
+
+    val requestPostNotificationLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ){
+            result ->
+        if(result){
+            showTime()
+
+        }
+    }
+
     if(openTimeDialog){
         TimePickerDialogue(onConfirmation = setAlarm, onDismissRequest = dismissTimePicker,
             dialogTitle = "What time should we deliver your Qote to you every day?",
@@ -77,13 +106,22 @@ fun SettingsTab(modifier: Modifier = Modifier) {
                 supportingContent = { Text("Turned On") },
                 trailingContent = {
                     Switch(checked = isReminderOn, onCheckedChange = { value ->
-                        isReminderOn = value
                         if(value){
-                            openTimeDialog = value
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                                //notificationManager.
+                                requestPostNotificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                showTime()
+                            }
                         }
-
                     })
                 })
+            Button(onClick = {
+                BgQoteFetchRepo(context).fecthQote()
+            }) {
+                Text("Show Notification")
+            }
         }
 
 }

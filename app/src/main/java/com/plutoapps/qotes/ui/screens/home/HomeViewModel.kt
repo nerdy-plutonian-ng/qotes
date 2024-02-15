@@ -5,21 +5,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.plutoapps.qotes.data.models.Qote
+import com.plutoapps.qotes.data.repositories.PrefsRepo
 import com.plutoapps.qotes.data.repositories.QoteApi
 import com.plutoapps.qotes.data.repositories.QotesRepo
 import com.plutoapps.qotes.data.repositories.UserPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Calendar
+import java.util.Date
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
-class HomeViewModel(private val qotesRepo: QotesRepo,private val userPreferencesRepository: UserPreferencesRepository) : ViewModel() {
+class HomeViewModel(private val qotesRepo: QotesRepo,private val userPreferencesRepository: PrefsRepo) : ViewModel() {
 
     private var _homeState = MutableStateFlow(HomeUi())
     val homeState: StateFlow<HomeUi?> = _homeState
@@ -35,6 +39,32 @@ class HomeViewModel(private val qotesRepo: QotesRepo,private val userPreferences
     }
 
     val favoritedQotes  : StateFlow<List<Qote>> = qotesRepo.getAllQotes().map { it }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000L), initialValue = emptyList())
+
+    fun initialLoad(){
+        viewModelScope.launch {
+            val reminder = userPreferencesRepository.getReminderTime().first()
+            _homeState.update {
+                it.copy(reminderTime = reminder)
+            }
+            val qote = userPreferencesRepository.getTodaysQote()
+            if(qote == null || ((qote.date.toLong() - Date().time) / (1000 * 60 * 60)) > 24) {
+                getQote()
+            } else {
+                _homeState.update {
+                    it.copy(qote = qote,isLoading = false)
+                }
+            }
+        }
+    }
+
+    fun setReminder(time : Long?){
+        viewModelScope.launch {
+            userPreferencesRepository.setReminderTime(time)
+            _homeState.update {
+                it.copy(reminderTime = time)
+            }
+        }
+    }
 
     fun getQote() {
         viewModelScope.launch {

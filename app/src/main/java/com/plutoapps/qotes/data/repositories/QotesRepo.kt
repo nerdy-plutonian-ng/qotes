@@ -15,11 +15,11 @@ import kotlinx.coroutines.flow.Flow
 interface QotesRepo {
     suspend fun favoriteQote(qote: Qote)
     suspend fun unFavoriteQote(qote: Qote)
-    fun getAllQotes() : Flow<List<Qote>>
-    suspend fun getNewQote() : Qote
+    fun getAllQotes(): Flow<List<Qote>>
+    suspend fun getNewQote(): Qote
 
-    suspend fun getTodaysQote() : Qote?
-
+    suspend fun getTodaysQote(): Qote?
+}
 @Dao
 interface QotesDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -60,5 +60,4 @@ class SqlQotesRepo(private val qotesDao: QotesDao, private val qoteService : Qot
         TODO("Not yet implemented")
     }
 
-}
 }

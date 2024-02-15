@@ -1,24 +1,14 @@
 package com.plutoapps.qotes.ui.screens.home
 
 import android.Manifest
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.TimePickerDialog
-import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -27,31 +17,26 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.app.NotificationCompat
 import com.plutoapps.qotes.R
 import com.plutoapps.qotes.data.repositories.BgQoteFetchRepo
-import com.plutoapps.qotes.ui.utils.Notify
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsTab(modifier: Modifier = Modifier) {
+fun SettingsTab(modifier: Modifier = Modifier, reminderTime: Long?, setReminder: (Long?) -> Unit) {
 
 
 
@@ -71,7 +56,12 @@ fun SettingsTab(modifier: Modifier = Modifier) {
 
     val setAlarm = {
         openTimeDialog = false
-        Toast.makeText(context,"${timeState.hour} : ${timeState.minute}",Toast.LENGTH_LONG).show()
+        val timeNow = Date()
+        timeNow.hours = timeState.hour
+        timeNow.minutes = timeState.minute
+        BgQoteFetchRepo(context,timeNow.time).fetchQote()
+        setReminder(timeNow.time)
+        Toast.makeText(context,"Your Qote will be delivered every day at ${timeState.hour} : ${timeState.minute}.",Toast.LENGTH_LONG).show()
     }
 
     fun showTime(){
@@ -103,25 +93,20 @@ fun SettingsTab(modifier: Modifier = Modifier) {
         ) {
             Text("Settings", style = MaterialTheme.typography.titleLarge)
             ListItem(headlineContent = { Text("Reminders") },
-                supportingContent = { Text("Turned On") },
+                supportingContent = { Text(if(reminderTime == null) "Turned Off" else "You will be notified ${Date(reminderTime).hours}:${Date(reminderTime).minutes} everyday") },
                 trailingContent = {
-                    Switch(checked = isReminderOn, onCheckedChange = { value ->
+                    Switch(checked = reminderTime != null, onCheckedChange = { value ->
                         if(value){
                             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                                //notificationManager.
                                 requestPostNotificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                             } else {
                                 showTime()
                             }
+                        } else {
+                            setReminder(null)
                         }
                     })
                 })
-            Button(onClick = {
-                BgQoteFetchRepo(context).fecthQote()
-            }) {
-                Text("Show Notification")
-            }
         }
 
 }
@@ -129,9 +114,8 @@ fun SettingsTab(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun SettingsTabPreview() {
-    SettingsTab()
+    SettingsTab(reminderTime = null, setReminder = {})
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

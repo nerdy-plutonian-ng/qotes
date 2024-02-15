@@ -3,9 +3,6 @@ package com.plutoapps.qotes.ui.screens.home
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -15,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.plutoapps.qotes.QotesApplication
@@ -23,6 +21,7 @@ import com.plutoapps.qotes.data.models.Qote
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
 
     //val viewModel =
     //    ViewModelProvider(LocalContext.current as ViewModelStoreOwner)[HomeViewModel::class.java]
@@ -37,6 +36,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     }
 
     val getQote: () -> Unit = {
+        viewModel.initialLoad()
+    }
+
+    val getNewQote: () -> Unit = {
         viewModel.getQote()
     }
 
@@ -51,6 +54,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         } else {
             viewModel.favoriteAQote(qote)
         }
+    }
+
+    val setReminder : (Long?) -> Unit = {
+        viewModel.setReminder(it)
     }
 
     LaunchedEffect(Unit) {
@@ -79,11 +86,11 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 .padding(paddingValues)
         ) {
             if (homeUiState.value!!.currentTab == 0)
-                QoteTab(homeUiState = homeUiState.value!!, getQote = getQote, toggleFavorite = toggleFavorite)
+                QoteTab(homeUiState = homeUiState.value!!, getQote = getQote,getNewQote = getNewQote, toggleFavorite = toggleFavorite)
             else if(homeUiState.value!!.currentTab == 1)
                 FavoritesTab(favourites = favourites.value, deleteFavouritedQote = deleteFavouritedQote)
             else
-                SettingsTab()
+                SettingsTab(reminderTime = homeUiState.value?.reminderTime,setReminder = setReminder)
         }
     }
 }

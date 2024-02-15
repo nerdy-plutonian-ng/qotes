@@ -6,7 +6,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.plutoapps.qotes.data.repositories.QoteApi
+import com.plutoapps.qotes.data.repositories.QotesDatabase
 import com.plutoapps.qotes.data.repositories.QotesRepo
+import com.plutoapps.qotes.data.repositories.SqlQotesRepo
 import com.plutoapps.qotes.data.repositories.UserPreferencesRepository
 
 private const val QOTE_PREFERENCE_NAME = "qote_preferences"
@@ -23,8 +25,7 @@ class QotesApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        qotesRepo = QotesRepo.SqlQotesRepo(QotesRepo.QotesDatabase.getDatabase(this).qotesDao(),QoteApi.retrofitService)
+        qotesRepo = SqlQotesRepo(QotesDatabase.getDatabase(this).qotesDao(),QoteApi.retrofitService)
         userPreferencesRepository = UserPreferencesRepository(dataStore)
     }
-
 }

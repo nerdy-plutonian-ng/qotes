@@ -11,11 +11,11 @@ import java.util.UUID
 @Entity(tableName = "qotes")
 data class Qote(
     @PrimaryKey
-    val id: String,
+    val id: String = UUID.randomUUID().toString(),
     val quote: String,
     val author: String,
     val category: String,
-    val date: String
+    val date: String = Date().time.toString()
 ) {
 
     fun shouldUpdateQote(date: Date): Boolean {

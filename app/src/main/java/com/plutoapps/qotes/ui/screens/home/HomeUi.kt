@@ -7,6 +7,7 @@ data class HomeUi(
     val isLoading: Boolean = true,
     val currentTab: Int = 0,
     val favourites: List<Qote> = emptyList(),
-    val currentFavorite: String? = null
+    val currentFavorite: String? = null,
+    val reminderTime : Long? = null
 )
 

@@ -17,10 +17,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,7 +34,8 @@ fun QoteTab(
     modifier: Modifier = Modifier,
     homeUiState: HomeUi,
     getQote: () -> Unit,
-    toggleFavorite: (Qote,Boolean) -> Unit
+    toggleFavorite: (Qote, Boolean) -> Unit,
+    getNewQote: () -> Unit
 ) {
 
     Column(
@@ -84,7 +81,7 @@ fun QoteTab(
                         modifier = modifier.size(64.dp)
                     )
                 }
-                Button(onClick = getQote) {
+                Button(onClick = getNewQote) {
                     Icon(
                         painter = painterResource(id = R.drawable.refresh),
                         contentDescription = null
@@ -100,6 +97,11 @@ fun QoteTab(
 @Preview(showBackground = true)
 @Composable
 fun QoteTabPreview() {
-    QoteTab(homeUiState = HomeUi(), getQote = {}, toggleFavorite = { _, _ -> })
+    QoteTab(
+        homeUiState = HomeUi(),
+        getQote = {},
+        toggleFavorite = { _, _ -> },
+        getNewQote = {  }
+    )
 }
 

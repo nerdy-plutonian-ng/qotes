@@ -1,5 +1,6 @@
 package com.plutoapps.qotes.ui.composables
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,24 +24,29 @@ import com.plutoapps.qotes.data.models.Qote
 fun QoteText(modifier: Modifier = Modifier, qote: Qote) {
     val quoteMarksStyle = SpanStyle(fontWeight = FontWeight.Bold, fontSize = 48.sp)
     val quoteStyle = SpanStyle(fontWeight = FontWeight.SemiBold, fontSize = 24.sp,)
-    Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            buildAnnotatedString {
-                withStyle(style = quoteMarksStyle) {
-                    append("“")
-                }
-                withStyle(style = quoteStyle,) {
-                    append(qote.quote)
-                }
-                withStyle(style = quoteMarksStyle) {
-                    append("”")
-                }
-            }, textAlign = TextAlign.Center, lineHeight = 48.sp
-        )
-        Spacer(modifier = modifier.height(8.dp))
-        Text("- ${qote.author}", textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyLarge)
-        Spacer(modifier = modifier.height(16.dp))
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+        PulseRing()
+        PulseRing(isSecondary = false,isSmall = false)
+        Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = quoteMarksStyle) {
+                        append("“")
+                    }
+                    withStyle(style = quoteStyle,) {
+                        append(qote.quote)
+                    }
+                    withStyle(style = quoteMarksStyle) {
+                        append("”")
+                    }
+                }, textAlign = TextAlign.Center, lineHeight = 48.sp
+            )
+            Spacer(modifier = modifier.height(8.dp))
+            Text("- ${qote.author}", textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyLarge)
+            Spacer(modifier = modifier.height(16.dp))
+        }
     }
+
 }
 
 @Preview(showBackground = true)

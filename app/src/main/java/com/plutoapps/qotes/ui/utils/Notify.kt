@@ -2,12 +2,15 @@ package com.plutoapps.qotes.ui.utils
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.core.app.NotificationCompat
+import com.plutoapps.qotes.MainActivity
 import com.plutoapps.qotes.R
 
 class Notify {
@@ -30,11 +33,15 @@ class Notify {
     }
 
     private fun showNotification(context: Context,title: String,description: String) {
+        val intent = Intent(context, MainActivity::class.java) // Replace with your activity
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE)
+
         val notification = NotificationCompat.Builder(context, "my_channel_id")
             .setContentTitle(title)
             .setContentText(description)
             .setSmallIcon(R.drawable.quote)
             .setStyle(NotificationCompat.BigTextStyle())
+            .addAction(NotificationCompat.Action.Builder(R.drawable.quote,"Open",pendingIntent).build())
             .build()
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

@@ -61,7 +61,7 @@ fun SettingsTab(modifier: Modifier = Modifier, reminderTime: Long?, setReminder:
         timeNow.minutes = timeState.minute
         BgQoteFetchRepo(context,timeNow.time).fetchQote()
         setReminder(timeNow.time)
-        Toast.makeText(context,"Your Qote will be delivered every day at ${timeState.hour} : ${timeState.minute}.",Toast.LENGTH_LONG).show()
+        Toast.makeText(context,"Your Qote will be delivered every day at ${timeState.hour} : ${timeState.minute}",Toast.LENGTH_LONG).show()
     }
 
     fun showTime(){

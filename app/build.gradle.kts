@@ -8,6 +8,7 @@ android {
     namespace = "com.plutoapps.qotes"
     compileSdk = 34
 
+    //version 1.2
     defaultConfig {
         applicationId = "com.plutoapps.qotes"
         minSdk = 24
